@@ -1,0 +1,28 @@
+{
+  "name": "acpd",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "bun --hot src/index.ts",
+    "start": "bun src/index.ts",
+    "test": "bun test",
+    "typecheck": "tsc --noEmit",
+    "openapi": "bun src/openapi.ts",
+    "asyncapi": "bun src/asyncapi.ts",
+    "specs": "bun src/openapi.ts && bun src/asyncapi.ts"
+  },
+  "dependencies": {
+    "@agentclientprotocol/sdk": "2.9.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@asyncapi/parser": "^3.6.6",
+    "@types/bun": "latest",
+    "openapi3-ts": "^4.6.2",
+    "yaml": "^2.9.1"
+  },
+  "peerDependencies": {
+    "typescript": "^7"
+  }
+}
