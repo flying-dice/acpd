@@ -19,17 +19,17 @@ test("rejects invalid configs", () => {
     expect(() => parseConfig({ agents: { a: { command: "a", cmd: "b" } } })).toThrow("Invalid acpd config");
 });
 
-test("searches the working directory upward, then user and system config directories", () => {
+test("searches the working directory upward, then ~/.acpd, then user and system config directories", () => {
     expect(configSearchPaths({ platform: "linux", cwd: "/home/u/proj", home: "/home/u", env: { XDG_CONFIG_HOME: "/xdg" } })).toEqual([
         "/home/u/proj/acpd.config.json", "/home/u/acpd.config.json", "/home/acpd.config.json", "/acpd.config.json",
-        "/xdg/acpd/config.json", "/etc/xdg/acpd/config.json", "/etc/acpd/config.json",
+        "/home/u/.acpd/config.json", "/xdg/acpd/config.json", "/etc/xdg/acpd/config.json", "/etc/acpd/config.json",
     ]);
     expect(configSearchPaths({ platform: "darwin", cwd: "/", home: "/Users/u", env: {} })).toEqual([
-        "/acpd.config.json", "/Users/u/.config/acpd/config.json", "/Users/u/Library/Application Support/acpd/config.json",
+        "/acpd.config.json", "/Users/u/.acpd/config.json", "/Users/u/.config/acpd/config.json", "/Users/u/Library/Application Support/acpd/config.json",
         "/etc/xdg/acpd/config.json", "/etc/acpd/config.json",
     ]);
     expect(configSearchPaths({ platform: "win32", cwd: String.raw`C:\proj`, home: String.raw`C:\Users\u`, env: { APPDATA: String.raw`C:\Users\u\AppData\Roaming` } })).toEqual([
-        String.raw`C:\proj\acpd.config.json`, String.raw`C:\acpd.config.json`,
+        String.raw`C:\proj\acpd.config.json`, String.raw`C:\acpd.config.json`, String.raw`C:\Users\u\.acpd\config.json`,
         String.raw`C:\Users\u\AppData\Roaming\acpd\config.json`, String.raw`C:\ProgramData\acpd\config.json`,
     ]);
 });
@@ -46,6 +46,11 @@ test("prefers --config, then ACPD_CONFIG, then the nearest discovered file", () 
         mkdirSync(dirname(userConfig));
         writeFileSync(userConfig, "{}");
         expect(findConfig(undefined, options)).toBe(userConfig);
+
+        const homeConfig = join(root, ".acpd", "config.json");
+        mkdirSync(dirname(homeConfig));
+        writeFileSync(homeConfig, "{}");
+        expect(findConfig(undefined, options)).toBe(homeConfig);
 
         const projectConfig = join(root, "project", "acpd.config.json");
         writeFileSync(projectConfig, "{}");

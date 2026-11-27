@@ -6,13 +6,14 @@
 # ACPD_BIN_DIR  where the binary goes (default: ~/.local/bin)
 #
 # If that directory is not on PATH, the installer adds it to your shell's
-# startup file. It also creates ~/.config/acpd/config.json from the example
-# config when you have none.
+# startup file. It also creates ~/.acpd/config.json from the example config
+# when you have no user config.
 set -eu
 
 cd "$(dirname "$0")/.."
 bin_dir="${ACPD_BIN_DIR:-$HOME/.local/bin}"
-config_dir="${XDG_CONFIG_HOME:-$HOME/.config}/acpd"
+config_dir="$HOME/.acpd"
+xdg_config="${XDG_CONFIG_HOME:-$HOME/.config}/acpd/config.json"
 
 if ! command -v bun >/dev/null 2>&1; then
     echo "acpd: Bun is required to build acpd. Install it from https://bun.sh" >&2
@@ -28,7 +29,7 @@ chmod 755 "$bin_dir/acpd.tmp"
 mv -f "$bin_dir/acpd.tmp" "$bin_dir/acpd"
 echo "Installed $bin_dir/acpd"
 
-if [ ! -e "$config_dir/config.json" ]; then
+if [ ! -e "$config_dir/config.json" ] && [ ! -e "$xdg_config" ]; then
     mkdir -p "$config_dir"
     cp acpd.config.json "$config_dir/config.json"
     echo "Created $config_dir/config.json"

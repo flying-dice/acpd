@@ -12,7 +12,7 @@ On Linux, macOS, or WSL, with [Bun](https://bun.sh) installed:
 
 This builds a standalone binary and installs it as `~/.local/bin/acpd`. Set `ACPD_BIN_DIR` to install somewhere else.
 - If that folder isn't on your `PATH`, the installer adds it to your shell's startup file (`~/.zshrc`, `~/.bashrc` (`~/.bash_profile` on macOS), fish's `conf.d`, or `~/.profile`), then prints the line to run in your current shell.
-- If you have no user config, it copies the example config to `~/.config/acpd/config.json`.
+- If you have no user config (`~/.acpd/config.json` or `~/.config/acpd/config.json`), it copies the example config to `~/.acpd/config.json`.
 - Running it again updates the binary without duplicating the `PATH` entry.
 
 Then run `acpd` and connect an ACP client to `ws://127.0.0.1:3000/acp`.
@@ -33,11 +33,12 @@ acpd reads one JSON config file. It uses the first one it finds, in this order:
 1. `--config <path>` (or `-c <path>`)
 2. The `ACPD_CONFIG` environment variable
 3. `acpd.config.json` in the working directory, then in each parent directory up to the root
-4. The user config directory:
+4. `~/.acpd/config.json` (`%USERPROFILE%\.acpd\config.json` on Windows)
+5. The user config directory:
    - Linux and macOS: `$XDG_CONFIG_HOME/acpd/config.json`, which defaults to `~/.config/acpd/config.json`
    - macOS also checks `~/Library/Application Support/acpd/config.json`
    - Windows: `%APPDATA%\acpd\config.json`
-5. The system config directory:
+6. The system config directory:
    - Linux and macOS: each `$XDG_CONFIG_DIRS` entry (default `/etc/xdg`) as `<dir>/acpd/config.json`, then `/etc/acpd/config.json`
    - Windows: `%ProgramData%\acpd\config.json`
 
