@@ -1,7 +1,9 @@
-import { dirname, join, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
 import type { ZodType } from "zod";
 import v1Spec from "@agentclientprotocol/sdk/schema/v1/schema.unstable.json";
+// A literal relative path, so `bun build --compile` embeds the validators. The package's
+// exports map hides this file, and the SDK ships no types for it.
+// @ts-expect-error TS7016: untyped JavaScript module.
+import * as sdkValidators from "../node_modules/@agentclientprotocol/sdk/dist/v1/unstable/schema/zod.gen.js";
 import { JsonRpcId, JsonRpcMessage } from "./schemas.ts";
 
 /**
@@ -10,8 +12,8 @@ import { JsonRpcId, JsonRpcMessage } from "./schemas.ts";
  * The method table comes from the official ACP v1 JSON Schema, whose payload
  * types carry `x-method` and `x-side` annotations. The validators are the zod
  * schemas the ACP TypeScript SDK generates from that same JSON Schema. The SDK
- * does not export them, so they are loaded from its `dist` folder by file path;
- * keep `@agentclientprotocol/sdk` pinned to an exact version.
+ * does not export them, so they are imported from its `dist` folder by relative
+ * path; keep `@agentclientprotocol/sdk` pinned to an exact version.
  */
 
 export const ACP_VERSION = 1;
@@ -50,8 +52,7 @@ export function methodTable(spec: Spec): MethodTable {
 export const spec = v1Spec as Spec;
 export const methods = methodTable(spec);
 
-const sdkRoot = resolve(dirname(fileURLToPath(import.meta.resolve("@agentclientprotocol/sdk/schema/v1/schema.unstable.json"))), "../..");
-export const validators: Record<string, ZodType> = await import(pathToFileURL(join(sdkRoot, "dist", "v1", "unstable", "schema", "zod.gen.js")).href);
+export const validators = sdkValidators as Record<string, ZodType>;
 
 function validate(type: string, value: unknown): boolean {
     const schema = validators[`z${type}`];

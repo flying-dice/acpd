@@ -1,15 +1,30 @@
 # acpd
 
-`acpd` is a minimal [Agent Client Protocol](https://agentclientprotocol.com) proxy. Remote ACP clients connect over a WebSocket, and acpd connects each one to a stdio ACP agent listed in `acpd.config.json`. Messages pass through unchanged, so clients get exactly the protocol version and features of the agent they reach.
+`acpd` is a minimal [Agent Client Protocol](https://agentclientprotocol.com) (ACP v1) proxy. Remote ACP clients connect over a WebSocket, and acpd connects each one to a stdio ACP agent listed in its config file. Messages are validated against ACP v1 and otherwise passed through unchanged.
 
-## Run
+## Install
+
+On Linux, macOS, or WSL, with [Bun](https://bun.sh) installed:
+
+```sh
+./scripts/install.sh
+```
+
+This builds a standalone binary and installs it as `~/.local/bin/acpd`. Set `ACPD_BIN_DIR` to install somewhere else.
+- If that folder isn't on your `PATH`, the installer adds it to your shell's startup file (`~/.zshrc`, `~/.bashrc` (`~/.bash_profile` on macOS), fish's `conf.d`, or `~/.profile`), then prints the line to run in your current shell.
+- If you have no user config, it copies the example config to `~/.config/acpd/config.json`.
+- Running it again updates the binary without duplicating the `PATH` entry.
+
+Then run `acpd` and connect an ACP client to `ws://127.0.0.1:3000/acp`.
+
+`bun run build` builds the binary alone, as `dist/acpd`. Bun can cross-compile with `--target`, for example `bun run build --target=bun-linux-arm64`.
+
+## Run from source
 
 ```sh
 bun install
 bun start            # or `bun dev` to restart on changes
 ```
-
-Connect an ACP client to `ws://127.0.0.1:3000/acp`.
 
 ## Configuration
 
