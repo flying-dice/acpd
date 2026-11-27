@@ -55,8 +55,9 @@ export interface SearchOptions {
 
 /**
  * Where acpd looks for its config when none is named, first match wins:
- * `acpd.config.json` in the working directory and each parent, then the
- * user config directory, then the system config directory.
+ * `acpd.config.json` in the working directory and each parent, then
+ * `~/.acpd/config.json`, then the user config directory, then the system
+ * config directory.
  */
 export function configSearchPaths({ cwd = process.cwd(), env = process.env, platform = process.platform, home = homedir() }: SearchOptions = {}): string[] {
     const { dirname, join, resolve } = platform === "win32" ? win32 : posix;
@@ -65,6 +66,7 @@ export function configSearchPaths({ cwd = process.cwd(), env = process.env, plat
         paths.push(join(dir, CONFIG_FILE));
         if (dirname(dir) === dir) break;
     }
+    paths.push(join(home, ".acpd", "config.json"));
     const user = (dir: string | undefined) => dir && paths.push(join(dir, "acpd", "config.json"));
     if (platform === "win32") {
         user(env.APPDATA ?? join(home, "AppData", "Roaming"));
